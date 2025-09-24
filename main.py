@@ -1,0 +1,60 @@
+from abc import ABC, abstractmethod
+from collections.abc import Callable
+from typing import NamedTuple
+
+import numpy as np
+from scipy.optimize import rosen, rosen_der
+
+class Evaluation(NamedTuple):
+    f: np.ndarray
+    g: np.ndarray | None
+
+
+class Algorithm(ABC):
+    @abstractmethod
+    def step(self, objective: Callable[[np.ndarray, bool], Evaluation]):
+        ...
+
+class Rosenbrock:
+    def __init__(self, n: int = 2):
+        self.n = n
+        if n == 2:
+            self.x = np.array((-1.1, 2.5))
+        else:
+            self.x = np.repeat(np.array([-1.2, 1.]), repeats=n//2)
+
+        self.n_passes = 0 # number of forward and backward passes
+
+        self.f_best = float('inf')
+        self.x_best = None
+
+    def _update_f_best(self, x, f):
+        if f < self.f_best:
+            self.x_best = x
+            self.f_best = f
+
+    def __call__(self, x: np.ndarray, backward:bool):
+        f = rosen(x)
+        g = None
+        if backward:
+            g = rosen_der(x)
+        self.n_passes += 1 + backward
+        print(f"{self.n_passes}: Evaluated {x}. {f = }, {g = }")
+        return Evaluation(f, g)
+
+    def minimize(self, algorithm: Algorithm):
+        for _ in range(100):
+            algorithm.step(self)
+            if self.n_passes >= self.n * 10:
+                break
+
+        print(f"reached {self.f_best} at {self.x_best}")
+        if self.f_best > 1e-6:
+            print(f"{algorithm.__class__.__name__} failed to minimize rosenbrock in 20 passes")
+
+
+def main():
+    """Tests if algorithm is able to minimize rosenbrock in 20 passes"""
+    # algorithm = ...
+    # rosenbrock = Rosenbrock()
+    # rosenbrock.minimize(algorithm)
