@@ -9,19 +9,23 @@ class BarzilaiBorwein(Algorithm):
         self.x_old = None
 
     def step(self, objective):
-        _, g = objective(self.x, True)
+        g = objective(self.x, True).g
         
         if self.g_old is not None:
             s = self.x - self.x_old
             y = g - self.g_old
             
             # Barzilai-Borwein step size
-            alpha = np.abs(s.dot(y) / y.dot(y))
+            alpha = np.abs(s.dot(s) / (s.dot(y) + 1e-9))
             
+            # Clip the step size to a reasonable range
+            alpha = np.clip(alpha, 1e-100, 1e100)
+            
+            self.x_old = np.copy(self.x)
+            self.g_old = np.copy(g)
             self.x -= alpha * g
         else:
+            self.x_old = np.copy(self.x)
+            self.g_old = np.copy(g)
             # Fallback to gradient descent for the first step
             self.x -= 0.001 * g
-            
-        self.x_old = np.copy(self.x)
-        self.g_old = np.copy(g)
