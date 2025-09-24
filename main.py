@@ -24,6 +24,7 @@ class Rosenbrock:
             self.x = np.repeat(np.array([-1.2, 1.]), repeats=n//2)
 
         self.n_passes = 0 # number of forward and backward passes
+        self.max_passes = 10*n
 
         self.f_best = float('inf')
         self.x_best = None
@@ -35,17 +36,27 @@ class Rosenbrock:
 
     def __call__(self, x: np.ndarray, backward:bool):
         f = rosen(x)
+
+        # update best x if within 10*n passes limit
+        if self.n_passes < self.max_passes:
+            self._update_f_best(x, f)
+
+        self.n_passes += 1 # forward pass
+
         g = None
         if backward:
             g = rosen_der(x)
-        self.n_passes += 1 + backward
+            self.n_passes += 1 # backward pass
+
         print(f"{self.n_passes}: Evaluated {x}. {f = }, {g = }")
         return Evaluation(f, g)
 
     def minimize(self, algorithm: Algorithm):
-        for _ in range(100):
+        for _ in range(self.n_passes):
             algorithm.step(self)
-            if self.n_passes >= self.n * 10:
+
+            # algorithm can perform more than 1 pass per step, 1 is lower bound
+            if self.n_passes >= self.max_passes:
                 break
 
         print(f"reached {self.f_best} at {self.x_best}")
