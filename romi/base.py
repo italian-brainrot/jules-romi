@@ -51,7 +51,7 @@ class Rosenbrock:
             self.n_passes += 1 # backward pass
 
         if self.n_passes < self.max_passes:
-            print(f"{self.n_passes}: Evaluated {x}. {f = }, {g = }")
+            print(f"{self.n_passes}: Evaluated {x}. f = {f:.5f}, {g = }")
 
         return Evaluation(f, g)
 
@@ -63,9 +63,9 @@ class Rosenbrock:
             if self.n_passes >= self.max_passes:
                 break
 
-        print(f"reached {self.f_best} at {self.x_best}")
+        print(f"reached {self.f_best:.5f} at {self.x_best}")
         if self.f_best > 1e-6:
-            print(f"{algorithm.__class__.__name__} failed to minimize rosenbrock in {self.max_passes} passes")
+            print(f"{algorithm.__class__.__name__} failed to minimize rosenbrock in {self.max_passes} passes.")
 
         else:
-            print(f'{algorithm.__class__.__name__} successfully minimized rosenbrock in under {self.max_passes} passes")
+            print(f"{algorithm.__class__.__name__} successfully minimized rosenbrock in under {self.max_passes} passes.")
