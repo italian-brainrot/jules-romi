@@ -65,4 +65,7 @@ class Rosenbrock:
 
         print(f"reached {self.f_best} at {self.x_best}")
         if self.f_best > 1e-6:
-            print(f"{algorithm.__class__.__name__} failed to minimize rosenbrock in 20 passes")
+            print(f"{algorithm.__class__.__name__} failed to minimize rosenbrock in {self.max_passes} passes")
+
+        else:
+            print(f'{algorithm.__class__.__name__} successfully minimized rosenbrock in under {self.max_passes} passes")
