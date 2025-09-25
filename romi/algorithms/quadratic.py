@@ -19,7 +19,7 @@ class QuadraticSurrogate(Algorithm):
         self.eval_points.append(np.copy(x))
         for i in range(self.n_eval_points - 1):
             point = np.copy(x)
-            point[i % n] += 0.1  # Perturb different dimensions
+            point[i % n] += 1.0  # Perturb different dimensions
             self.eval_points.append(point)
 
     def step(self, objective):
@@ -31,12 +31,12 @@ class QuadraticSurrogate(Algorithm):
             self.eval_grads.append(g)
             self.step_count += 1
             if self.step_count == self.n_eval_points:
-                self._fit_and_minimize()
+                self._fit_and_minimize(objective)
         else:
             # After fitting, do nothing
             pass
 
-    def _fit_and_minimize(self):
+    def _fit_and_minimize(self, objective):
         n = len(self.x)
         n_points = len(self.eval_points)
         
@@ -99,6 +99,7 @@ class QuadraticSurrogate(Algorithm):
         try:
             x_min = np.linalg.solve(H, -g0)
             self.x = x_min
+            objective(self.x, False) # Evaluate the new point
         except np.linalg.LinAlgError:
             # If the Hessian is singular, we can't solve the system.
             # Fallback to the last evaluated point.
