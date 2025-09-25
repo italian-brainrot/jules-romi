@@ -2,7 +2,7 @@ import numpy as np
 
 from ..base import Algorithm
 
-class SurrogateModel(Algorithm):
+class SeparableCubicSurrogate(Algorithm):
     def __init__(self, x: np.ndarray):
         super().__init__(x)
         self.eval_points = []
