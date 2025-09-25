@@ -18,8 +18,7 @@ class QuadraticSurrogate(Algorithm):
         # Generate evaluation points
         self.eval_points.append(np.copy(x))
         for i in range(self.n_eval_points - 1):
-            point = np.copy(x)
-            point[i % n] += 1.0  # Perturb different dimensions
+            point = np.copy(x) + np.random.rand(n) * 0.1
             self.eval_points.append(point)
 
     def step(self, objective):
